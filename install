@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+DIRECTORY_NAME=$(dirname "$0")
+cp $DIRECTORY_NAME/mamu.sh $DIRECTORY_NAME/mamu
+chmod +x  $DIRECTORY_NAME/mamu
+sudo cp  $DIRECTORY_NAME/mamu /usr/local/bin/mamu
+
