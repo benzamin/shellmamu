@@ -120,12 +120,22 @@ abspath() #{{{1     # Gets the absolute path of the given path. Will resolve pat
     IFS=$OIFS
 }
 
+#helpText#$ mamu help (Prints help for all available commands)
+printHelpText()
+{
+	echo "${COLOR_MAGENTA}------------------------------ List of utilities -------------------------------\n"
+	sed -n 's/^#helpText#//p' $0
+	echo "\n------------------------------------ END ---------------------------------------\n${COLOR_NONE}"
+
+}
+
+
 
 ################################################################################
 ####################### Utility Commands functions #############################
 ################################################################################
 
-
+#helpText#$ mamu countdown (counts down with voice feedback a certain amount of seconds)
 countdown() {
 	SECONDS=0
 	if [ $# -lt 1 ]
@@ -145,6 +155,7 @@ countdown() {
 		say 'countdown done'
 }
 
+#helpText#$ mamu findnreplace (finds given text and replaces it with a new one in a file)
 findnreplace(){
 
 	FILE_NAME=""
@@ -171,6 +182,7 @@ findnreplace(){
 	rm $DIRECTORY_NAME//*".bak"
 }
 
+#helpText#$ mamu findtext (finds given text in a file or folder and shows a list of them)
 findtext()
 {
 	SEARCH_TEXT=""
@@ -179,8 +191,8 @@ findtext()
 	if [ $# -lt 2 ]
 		then
 		printTipsText "You can also use findtext command like - $ mamu findtext 'love' ~/Desktop/Song-Lyrics"
-		SEARCH_PATH=$(readInputFile "Which folder/path you want to search? ${COLOR_NONE}->")
-		SEARCH_TEXT=$(readText "${COLOR_GREEN}What text you want to search in files?  -> " )
+		SEARCH_PATH=$(readInputFile "Which file/folder you want to search? ${COLOR_NONE}->")
+		SEARCH_TEXT=$(readText "What text you want to search in files?  -> " )
 	else
 		SEARCH_PATH=$(abspath "$1")
 		SEARCH_TEXT="$2"
@@ -192,6 +204,7 @@ findtext()
 	#grep --exclude=*.o -rnw '/path/to/somewhere/' -e "pattern"
 }
 
+#helpText#$ mamu symboliclink (make a symbolic link of a file/folder into another folder)
 symboliclink()
 {
 
@@ -214,17 +227,23 @@ symboliclink()
 	fi
 }
 
+#helpText#$ mamu httpserver (starts basic python HTTP server in a given port & directory)
 httpserver()
 {
-	if [ $# -ne 1 ]; then
-        printTipsText "You can also use findnreplace command like - $ mamu simpleserver 8080"
-		python -m SimpleHTTPServer 8080
+	SOURCE_PATH=""
+	SERVER_PORT=""
+	if [ $# -ne 2 ]; then
+        printTipsText "You can also use findnreplace command like - $ mamu simpleserver ~/Desktop/MyWebsite 8080"
+		SOURCE_PATH=$(readInputFile "Which folder you want to serve as HTTP server? -> " )
+		SERVER_PORT=$(readText "What port to use for serving HTTP server? (ex: 8080)  -> " )
+		pushd "$SOURCE_PATH"; python -m SimpleHTTPServer $SERVER_PORT; popd
 	else
-		python -m SimpleHTTPServer $1
+		pushd "$1"; python -m SimpleHTTPServer $2; popd
 	fi
 
 }
 
+#helpText#$ mamu killnode (kills all running node.js instances or a given one)
 killnode(){
 
 	if [ $# -ne 1 ]; then
@@ -240,19 +259,21 @@ killnode(){
     		printSuccessText "Killed $PROCESS_NAME node process!"
 		fi
 	fi
-
-	
 }
-
 
 ########################################
 ####### ENTRY POINT OF USER INPUT ######
 ########################################
 
 if [ $# -lt 1 ]; then
-    echo "Plese provide a path Utility name, like countdown, findNreplace"
+	echo "${COLOR_CYAN}${TEXT_BOLD}\nWelcome to ShellMamu, a collection of shell utilities which ask for arguments. ${COLOR_NONE}"
+	printHelpText
 else
     "$@"
+	if [ $? -ne 0 ]; then
+		echo "${COLOR_RED}${TEXT_BOLD}Please provide a valid utility name, available utilities are: ${COLOR_NONE}"
+		printHelpText
+	fi
 fi
 exit
 
