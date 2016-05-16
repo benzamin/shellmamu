@@ -121,12 +121,11 @@ abspath() #{{{1     # Gets the absolute path of the given path. Will resolve pat
 }
 
 #helpText#$ mamu help (Prints help for all available commands)
-printHelpText()
+help()
 {
 	echo "${COLOR_MAGENTA}------------------------------ List of utilities -------------------------------\n"
 	sed -n 's/^#helpText#//p' $0
 	echo "\n------------------------------------ END ---------------------------------------\n${COLOR_NONE}"
-
 }
 
 
@@ -267,12 +266,12 @@ killnode(){
 
 if [ $# -lt 1 ]; then
 	echo "${COLOR_CYAN}${TEXT_BOLD}\nWelcome to ShellMamu, a collection of shell utilities which ask for arguments. ${COLOR_NONE}"
-	printHelpText
+	help
 else
     "$@"
 	if [ $? -ne 0 ]; then
 		echo "${COLOR_RED}${TEXT_BOLD}Please provide a valid utility name, available utilities are: ${COLOR_NONE}"
-		printHelpText
+		help
 	fi
 fi
 exit
