@@ -50,7 +50,7 @@ fileExists(){
 readInputFile()
 {
 	until [ "$FILE_PATH" ]; do
-		read -e -p "${COLOR_BLUE}$1 ${COLOR_NONE}" FILE_PATH				
+		read -e -p "${COLOR_BLUE}$1 ${COLOR_NONE}" FILE_PATH
 	done
 	echo $(abspath "$FILE_PATH")
 }
@@ -58,7 +58,7 @@ readInputFile()
 readText()
 {
 	until [ "$INPUT_TEXT" ]; do
-		read -p "${COLOR_BLUE} $1 ${COLOR_NONE}" INPUT_TEXT					
+		read -p "${COLOR_BLUE} $1 ${COLOR_NONE}" INPUT_TEXT
 	done
 	echo $INPUT_TEXT
 }
@@ -75,6 +75,7 @@ rtrim() #{{{1 # Removes all trailing whitespace (from the right).
 }
 trim() #{{{1 # Removes all leading/trailing whitespace
 {
+	#could've been very simple, like TRIMMED_PATH=`echo "$SOME_PATH" | sed 's/^ *//;s/ *$//'`
     ltrim "$1" | rtrim "$1"
 }
 squeeze() #{{{1 # Removes leading/trailing whitespace and condenses all other consecutive whitespace into a single space.
@@ -129,8 +130,8 @@ countdown() {
 	SECONDS=0
 	if [ $# -lt 1 ]
 		then
-		echo ":::TIPS::: You can also use countdown command like - $ mamu countdown 10 "
-		read -p "How many seconds you want to countdown? -> " SECONDS
+		printTipsText "You can also use countdown command like - $ mamu countdown 10 "
+		SECONDS=$(readText "How many seconds you want to countdown? -> ")
 	else
 		SECONDS=$1
 	fi
@@ -152,12 +153,10 @@ findnreplace(){
 
 	if [ $# -lt 3 ]
 		then
-			IFS="
-			"
-		echo ":::TIPS::: You can also use findnreplace command like - $ mamu findnreplace /Desktop/myFile.txt 'Old text' 'New text' "
-		read -e -p "In which file you want to find a replace text?  -> " FILE_NAME
-		read -p "Which text you want to find? -> " FIND_TEXT
-		read -p "What text you want to replace with? -> " REPLACE_TEXT
+		printTipsText "You can also use findnreplace command like - $ mamu findnreplace /Desktop/myFile.txt 'Old text' 'New text'"
+		FILE_NAME=$(readInputFile  "In which file you want to find a replace text?  -> ")
+		FIND_TEXT=$(readText "Which text you want to find? -> ")
+		REPLACE_TEXT=$(readText "What text you want to replace with? -> ")
 	else
 		FILE_NAME=$1
 		FIND_TEXT=$2
@@ -165,7 +164,7 @@ findnreplace(){
 	fi
 	##remove the white spaces
 	FILE_NAME=`echo "$FILE_NAME" | sed 's/^ *//;s/ *$//'`
-	
+
 	sed -i.bak "s/$FIND_TEXT/$REPLACE_TEXT/g" $FILE_NAME
 
 	DIRECTORY_NAME=$(dirname "$FILE_NAME")
@@ -176,25 +175,22 @@ findtext()
 {
 	SEARCH_TEXT=""
 	SEARCH_PATH=""
-	
+
 	if [ $# -lt 2 ]
 		then
-		IFS="
-		"
 		printTipsText "You can also use findtext command like - $ mamu findtext 'love' ~/Desktop/Song-Lyrics"
-		read -p "${COLOR_GREEN}What text you want to search in files?  -> " SEARCH_TEXT
-		read -e -p "Which folder/path you want to search? ${COLOR_NONE}->" SEARCH_PATH
+		SEARCH_PATH=$(readInputFile "Which folder/path you want to search? ${COLOR_NONE}->")
+		SEARCH_TEXT=$(readText "${COLOR_GREEN}What text you want to search in files?  -> " )
 	else
-		SEARCH_TEXT="$1"
-		SEARCH_PATH="$2"
+		SEARCH_PATH=$(abspath "$1")
+		SEARCH_TEXT="$2"
+
 	fi
 
-	SEARCH_PATH=`echo "$SEARCH_PATH" | sed 's/^ *//;s/ *$//'`
-	
 	grep -irw -n  $SEARCH_PATH -e "$SEARCH_TEXT"
 	#grep --include=\*.{c,h} -rnw '/path/to/somewhere/' -e "pattern"
 	#grep --exclude=*.o -rnw '/path/to/somewhere/' -e "pattern"
-} 
+}
 
 symboliclink()
 {
@@ -203,7 +199,7 @@ symboliclink()
 	DESTINATION_PATH=""
 	if [ $# -lt 2 ]
 		then
-		printTipsText "You can also use symboliclink command like - $ mamu symboliclink /Users/benzamin/Desktop/Songs/MichelJackson /Users/benzamin/Desktop/"
+		printTipsText "You can also use symboliclink command like - $ mamu symboliclink ~/Desktop/Songs/MichelJackson ~/Desktop/FavouriteSongs"
 		SOURCE_PATH=$(readInputFile "Which folder/file you want to make symbolic-link of? -> " )
 		DESTINATION_PATH=$(readInputFile "Where to put the symbolic-link? -> ")
 	else
@@ -216,8 +212,37 @@ symboliclink()
 	if [ $? -eq 0 ]; then
     	printSuccessText "Made a symbolic link from $SOURCE_PATH to $DESTINATION_PATH"
 	fi
-} 
+}
 
+httpserver()
+{
+	if [ $# -ne 1 ]; then
+        printTipsText "You can also use findnreplace command like - $ mamu simpleserver 8080"
+		python -m SimpleHTTPServer 8080
+	else
+		python -m SimpleHTTPServer $1
+	fi
+
+}
+
+killnode(){
+
+	if [ $# -ne 1 ]; then
+        printTipsText "You can also use findnreplace command like - $ mamu killnode app.js"
+		kill $(ps aux | grep .js | awk '{print $2}')
+		if [ $? -eq 0 ]; then
+    		printSuccessText "Killed all node process!"
+		fi
+	else
+		PROCESS_NAME="$1"
+		kill $(ps aux | grep $PROCESS_NAME | awk '{print $2}')
+		if [ $? -eq 0 ]; then
+    		printSuccessText "Killed $PROCESS_NAME node process!"
+		fi
+	fi
+
+	
+}
 
 
 ########################################
@@ -230,7 +255,5 @@ else
     "$@"
 fi
 exit
-
-
 
 
