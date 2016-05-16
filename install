@@ -2,5 +2,12 @@
 DIRECTORY_NAME=$(dirname "$0")
 cp $DIRECTORY_NAME/mamu.sh $DIRECTORY_NAME/mamu
 chmod +x  $DIRECTORY_NAME/mamu
+echo "`tput setaf 1``tput bold`mamu will install now, please enter your system password if needed!`tput sgr0`"
 sudo cp  $DIRECTORY_NAME/mamu /usr/local/bin/mamu
+
+if [ $? -eq 0 ]; then
+    echo "`tput setaf 2``tput bold`COOL! mamu now installed, write 'mamu' in terminal to see details :)`tput sgr0`"
+else
+    echo "`tput setaf 1``tput bold`Ooops! Something wrong, can't copy mamu in /usr/local/bin/, please try again.`tput sgr0`"
+fi
 
