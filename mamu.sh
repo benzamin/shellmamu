@@ -33,7 +33,7 @@ printSuccessText()
 }
 printFailureText()
 {
-	echo "${COLOR_RED}${TEXT_BOLD}Success: $1 ${COLOR_NONE}"
+	echo "${COLOR_RED}${TEXT_BOLD}Failure: $1 ${COLOR_NONE}"
 }
 folderExists(){
 	if [ -d "$1" ]; then
@@ -232,7 +232,7 @@ httpserver()
 	SOURCE_PATH=""
 	SERVER_PORT=""
 	if [ $# -ne 2 ]; then
-        printTipsText "You can also use findnreplace command like - $ mamu simpleserver ~/Desktop/MyWebsite 8080"
+        printTipsText "You can also use findnreplace command like - $ mamu httpserver ~/Desktop/MyWebsite 8080"
 		SOURCE_PATH=$(readInputFile "Which folder you want to serve as HTTP server? -> " )
 		SERVER_PORT=$(readText "What port to use for serving HTTP server? (ex: 8080)  -> " )
 		pushd "$SOURCE_PATH"; python -m SimpleHTTPServer $SERVER_PORT; popd
@@ -258,6 +258,36 @@ killnode(){
     		printSuccessText "Killed $PROCESS_NAME node process!"
 		fi
 	fi
+}
+
+#helpText#$ mamu testtls (tests which TLS versions supported on a given website)
+testtls()
+{
+	SERVER=""
+	if [ $# -ne 1 ]; then
+		printTipsText "You can also use testtls command like - $ mamu testtls https://google.com"
+		SERVER=$(readText "What HTTP/S server you want to test? -> " )
+	else
+		SERVER="$1"
+	fi
+
+	function testTLSVersion()
+	{
+		TLS=$1
+		echo "Testing TLS$1 on $SERVER..."
+		OUT=$(curl -v --silent --tlsv$TLS https://$SERVER/ 2>&1 | grep TLS)
+
+		if [ -z "$OUT" ]; then
+			 printFailureText "TLS$TLS is NOT SUPPORTED on $SERVER"
+		else
+			printSuccessText "TLS$TLS is supported on $SERVER"
+		fi
+	}
+
+	testTLSVersion 1.2
+	testTLSVersion 1.1
+	testTLSVersion 1.0
+
 }
 
 ########################################
