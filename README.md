@@ -32,4 +32,5 @@ $ mamu symboliclink (make a symbolic link of a file/folder into another folder)
 $ mamu httpserver (starts basic python HTTP server in a given port & directory)
 $ mamu killnode (kills all running node.js instances or a given one)
 $ mamu testtls (tests which TLS versions supported on a given website)
+$ mamu iossimulator ( shows/open ios simulator documents directory location)
 ```

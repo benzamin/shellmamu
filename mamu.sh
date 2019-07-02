@@ -290,6 +290,23 @@ testtls()
 
 }
 
+#helpText#$ mamu iossimulator ( shows/open ios simulator documents directory location)
+iossimulator()
+{
+	BUNDLEID=""
+	if [ $# -ne 1 ]; then
+		printTipsText "You can also use iossimulator command like - $ mamu iossimulator com.mycompany.myapp"
+		BUNDLEID=$(readText "What is the bundle identifier of the app? -> " )
+	else
+		BUNDLEID="$1"
+	fi
+
+	open `xcrun simctl get_app_container booted $BUNDLEID data`
+	PATH=$(xcrun simctl get_app_container booted $BUNDLEID data)
+	printSuccessText "Simulator documents directory Path for $BUNDLEID is: $PATH" 
+
+}
+
 ########################################
 ####### ENTRY POINT OF USER INPUT ######
 ########################################
